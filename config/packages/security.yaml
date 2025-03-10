@@ -9,8 +9,7 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: email  # On utilise l’email pour s’identifier
-        # used to reload user from session & other features (e.g. switch_user)
+                property: email
 
     firewalls:
         dev:
@@ -23,9 +22,17 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
+                username_parameter: _username  # Correspond au champ dans le formulaire
+                password_parameter: _password
             logout:
                 path: app_logout
                 target: app_home
+
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+                # always_remember_me: true  # Activer si nécessaire
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }

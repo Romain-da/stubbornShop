@@ -20,11 +20,11 @@
             {% for product in products %}
                 <div class="col-md-4 mb-4">
                     <div class="card">
-                        <img src="https://via.placeholder.com/150" class="card-img-top" alt="{{ product.name }}">
+                        <img src="{{ asset('uploads/products/' ~ product.image) }}" class="card-img-top" alt="{{ product.name }}">
                         <div class="card-body">
                             <h5 class="card-title">{{ product.name }}</h5>
                             <p class="card-text">{{ product.price }} €</p>
-                            <a href="#" class="btn btn-primary">VOIR</a>
+                            <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn btn-primary">Voir</a>
                         </div>
                     </div>
                 </div>
