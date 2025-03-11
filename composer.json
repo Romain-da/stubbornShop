@@ -12,6 +12,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/migrations": "^3.8",
         "doctrine/orm": "^3.3",
+        "stripe/stripe-php": "^16.6",
         "symfony/console": "7.2.*",
         "symfony/dotenv": "7.2.*",
         "symfony/flex": "^2",

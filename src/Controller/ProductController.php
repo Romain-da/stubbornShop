@@ -42,13 +42,12 @@ final class ProductController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $product = new Product();
-        $product->setCreatedAt(new \DateTimeImmutable()); // 🔹 Ajoute la date de création
+        $product->setCreatedAt(new \DateTimeImmutable()); // ✅ Ajoute la date de création automatiquement
 
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Gestion de l'upload d'image
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
                 $newFilename = $this->handleImageUpload($imageFile, $slugger);
@@ -60,7 +59,8 @@ final class ProductController extends AbstractController
             $entityManager->persist($product);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Le produit a été ajouté avec succès !');
+            return $this->redirectToRoute('app_product_index');
         }
 
         return $this->render('product/new.html.twig', [
@@ -85,13 +85,10 @@ final class ProductController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Gestion de l'upload d'image
-            /** @var UploadedFile $imageFile */
             $imageFile = $form->get('image')->getData();
             if ($imageFile) {
                 $newFilename = $this->handleImageUpload($imageFile, $slugger);
                 if ($newFilename) {
-                    // Supprimer l'ancienne image si elle existe
                     if ($product->getImage()) {
                         $this->deleteImageFile($product->getImage());
                     }
@@ -100,7 +97,9 @@ final class ProductController extends AbstractController
             }
 
             $entityManager->flush();
-            return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+
+            $this->addFlash('success', 'Le produit a été modifié avec succès !');
+            return $this->redirectToRoute('app_product_index');
         }
 
         return $this->render('product/edit.html.twig', [
@@ -114,19 +113,20 @@ final class ProductController extends AbstractController
     public function delete(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete' . $product->getId(), $request->request->get('_token'))) {
-            // Supprimer l'image associée
             if ($product->getImage()) {
                 $this->deleteImageFile($product->getImage());
             }
             $entityManager->remove($product);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Le produit a été supprimé avec succès.');
         }
 
-        return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_product_index');
     }
 
     /**
-     * Gère l'upload d'image et retourne le nom de fichier.
+     * 🔹 Gère l'upload d'image et retourne le nom du fichier.
      */
     private function handleImageUpload(UploadedFile $imageFile, SluggerInterface $slugger): ?string
     {
@@ -141,12 +141,13 @@ final class ProductController extends AbstractController
             );
             return $newFilename;
         } catch (FileException $e) {
+            $this->addFlash('danger', 'Erreur lors de l\'envoi de l\'image.');
             return null;
         }
     }
 
     /**
-     * Supprime une image du répertoire.
+     * 🔹 Supprime une image du répertoire.
      */
     private function deleteImageFile(string $filename): void
     {
@@ -155,7 +156,7 @@ final class ProductController extends AbstractController
             try {
                 unlink($filePath);
             } catch (\Exception $e) {
-                // Log error if necessary
+                $this->addFlash('warning', 'Impossible de supprimer l\'ancienne image.');
             }
         }
     }
