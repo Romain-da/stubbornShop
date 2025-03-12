@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2 class="mb-4">Mon compte</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">Informations personnelles</div>
+        <div class="card-body">
+            <p><strong>Nom :</strong> {{ user.username }}</p>
+            <p><strong>Email :</strong> {{ user.email }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">Adresse de livraison</div>
+        <div class="card-body">
+            {% if user.address %}
+                <p>{{ user.address }}</p>
+            {% else %}
+                <p>Aucune adresse enregistrée.</p>
+                <a href="{{ path('app_edit_address') }}" class="btn btn-primary">Ajouter une adresse</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Commandes en cours</div>
+        <div class="card-body">
+            {% if orders|length > 0 %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.createdAt|date('d/m/Y H:i') }}</td>
+                                <td>
+                                    {% if order.status == 'pending' %}
+                                        <span class="badge bg-warning">En attente</span>
+                                    {% elseif order.status == 'paid' %}
+                                        <span class="badge bg-success">Payée</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Annulée</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ order.total|number_format(2, ',', ' ') }} €</td>
+                                <td>
+                                    <a href="{{ path('app_order_detail', {id: order.id}) }}" class="btn btn-info btn-sm">
+                                        Détails
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Aucune commande en cours.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
