@@ -16,9 +16,10 @@ class CartController extends AbstractController
     public function index(SessionInterface $session): Response
     {
         $cart = $session->get('cart', []);
-
+        
         return $this->render('cart/index.html.twig', [
             'cart' => $cart,
+            'stripe_public_key' => $this->getParameter('stripe_public_key') // 🔹 Ajout de la clé
         ]);
     }
 

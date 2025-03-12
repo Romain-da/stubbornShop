@@ -6,7 +6,7 @@
 <div class="container mt-4">
     <h2 class="mb-4">Votre Panier</h2>
 
-    {% if cart|length > 0 %}
+    {% if cart is defined and cart|length > 0 %}
         <table class="table">
             <thead>
                 <tr>
@@ -19,33 +19,74 @@
                 </tr>
             </thead>
             <tbody>
+                {% set total = 0 %}
                 {% for item in cart %}
                     <tr>
                         <td>{{ item.name }}</td>
                         <td>{{ item.size }}</td>
                         <td>{{ item.quantity }}</td>
                         <td>{{ item.price }} €</td>
-                        <td>{{ item.price * item.quantity }} €</td>
+                        <td>{{ (item.price * item.quantity)|number_format(2, ',', ' ') }} €</td>
                         <td>
                             <a href="{{ path('app_cart_remove', { 'id': item.id, 'size': item.size }) }}" class="btn btn-danger btn-sm">
                                 Supprimer
                             </a>
                         </td>
                     </tr>
+                    {% set total = total + (item.price * item.quantity) %}
                 {% endfor %}
             </tbody>
         </table>
 
         <div class="text-end">
+            <strong>Total du panier : {{ total|number_format(2, ',', ' ') }} €</strong>
+        </div>
+
+        <div class="d-flex justify-content-between mt-3">
+            <a href="{{ path('app_product_index') }}" class="btn btn-secondary">Continuer mes achats</a>
             <a href="{{ path('app_cart_clear') }}" class="btn btn-warning">Vider le panier</a>
+            <button id="checkout-button" class="btn btn-success">Payer la commande</button>
         </div>
-
-        <div class="text-end">
-            <a href="{{ path('app_product_index') }}" class="btn btn-secondary mt-3">Continuer mes achats</a>
-        </div>
-
     {% else %}
         <p class="text-center">Votre panier est vide.</p>
     {% endif %}
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        {% if stripe_public_key is defined %}
+            const stripe = Stripe("{{ stripe_public_key }}");
+        {% else %}
+            console.error("Erreur : la clé publique Stripe est manquante.");
+        {% endif %}
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const checkoutButton = document.getElementById("checkout-button");
+            if (checkoutButton) {
+                checkoutButton.addEventListener("click", function () {
+                    // 🔹 Convertir le panier en JSON et afficher dans la console
+                    let cartData = {{ cart|json_encode()|raw }};
+                    console.log("📦 Données envoyées au serveur :", cartData);
+
+                    fetch("{{ path('app_checkout') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ cart: cartData }) // 🔹 Envoie du panier au serveur
+                    })
+                    .then(response => response.json())
+                    .then(session => {
+                        if (session.error) {
+                            console.error("❌ Erreur lors du paiement :", session.error);
+                            alert("Erreur : " + session.error);
+                        } else {
+                            return stripe.redirectToCheckout({ sessionId: session.id });
+                        }
+                    })
+                    .catch(error => console.error("❌ Erreur réseau :", error));
+                });
+            }
+        });
+    </script>
 </div>
 {% endblock %}
