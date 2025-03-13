@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Commandes{% endblock %}
+
+{% block body %}
+    <h2>Mes Commandes</h2>
+    
+    {% if orders is empty %}
+        <p>Aucune commande en cours.</p>
+    {% else %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.createdAt|date('d/m/Y H:i') }}</td>
+                        <td>{{ order.total }} €</td>
+                        <td>{{ order.status }}</td>
+                        <td>
+                            <a href="{{ path('app_order_detail', {'id': order.id}) }}" class="btn btn-info btn-sm">Détails</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Ajout de la liste en complément -->
+        <h3>Résumé des commandes</h3>
+        <ul>
+            {% for order in orders %}
+                <li>
+                    Commande #{{ order.id }} - Total : {{ order.total }} € - Statut : {{ order.status }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
