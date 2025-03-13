@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class StripeController extends AbstractController
 {
@@ -50,17 +51,17 @@ class StripeController extends AbstractController
     }
 
     #[Route('/checkout/success', name: 'app_checkout_success')]
-    public function success(SessionInterface $session): Response
+    public function success(): Response
     {
         // Vider le panier après paiement
         $session->set('cart', []);
 
-        return $this->render('cart/success.html.twig');
+        return $this->render('checkout/success.html.twig');
     }
 
     #[Route('/checkout/cancel', name: 'app_checkout_cancel')]
     public function cancel(): Response
     {
-        return $this->render('cart/cancel.html.twig');
+        return $this->render('checkout/cancel.html.twig');
     }
 }

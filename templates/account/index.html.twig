@@ -15,10 +15,13 @@
     </div>
 
     <div class="card mb-4">
-        <div class="card-header">Adresse de livraison</div>
+    <div class="card-header">Adresse de livraison</div>
         <div class="card-body">
-            {% if user.address %}
-                <p>{{ user.address }}</p>
+            {% if user.street and user.postalCode and user.city %}
+                <p><strong>{{ user.fullName }}</strong></p>
+                <p>{{ user.street }}</p>
+                <p>{{ user.postalCode }} {{ user.city }}</p>
+                <p>Téléphone : {{ user.phoneNumber }}</p>
             {% else %}
                 <p>Aucune adresse enregistrée.</p>
                 <a href="{{ path('app_edit_address') }}" class="btn btn-primary">Ajouter une adresse</a>
