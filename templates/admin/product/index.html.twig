@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Produits{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h2 class="my-4 text-center">Back-Office - Gestion des Produits</h2>
+
+    {% for product in products %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="Image produit" class="img-fluid">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" value="{{ product.name }}" readonly>
+                </div>
+                <div class="col-md-1">
+                    <input type="text" class="form-control" value="{{ product.price }} €" readonly>
+                </div>
+                <div class="col-md-1">
+                    <input type="text" class="form-control" value="{{ product.stockXS }}" readonly>
+                </div>
+                <div class="col-md-1">
+                    <input type="text" class="form-control" value="{{ product.stockS }}" readonly>
+                </div>
+                <div class="col-md-1">
+                    <input type="text" class="form-control" value="{{ product.stockM }}" readonly>
+                </div>
+                <div class="col-md-1">
+                    <input type="text" class="form-control" value="{{ product.stockL }}" readonly>
+                </div>
+                <div class="col-md-1">
+                    <input type="text" class="form-control" value="{{ product.stockXL }}" readonly>
+                </div>
+                <div class="col-md-1">
+                    <a href="{{ path('admin_product_manage', { 'id': product.id }) }}" class="btn btn-warning btn-sm w-100">Modifier</a>
+                </div>
+                <div class="col-md-1">
+                    <form action="{{ path('admin_product_delete', { 'id': product.id }) }}" method="POST" onsubmit="return confirm('Confirmer la suppression ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                        <button type="submit" class="btn btn-danger btn-sm w-100">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col text-center">
+                    <a href="{{ path('app_cart_add', { 'id': product.id }) }}" class="btn btn-success btn-sm">Ajouter au panier</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

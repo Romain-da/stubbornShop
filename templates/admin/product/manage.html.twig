@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.id ? 'Modifier' : 'Créer' }} un produit{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h2 class="my-4 text-center">{{ product.id ? 'Modifier' : 'Créer' }} un produit</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form_start(form) }}
+
+        <div class="row">
+            <div class="col-md-2">
+                <label>Image</label>
+                {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+                {% if product is defined and product.image %}
+                    <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="Image actuelle" class="img-fluid mt-2">
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <label>Nom</label>
+                {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="col-md-2">
+                <label>Prix (€)</label>
+                {{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="col-md-2">
+                <label>Mettre en avant</label>
+                <input type="checkbox" name="is_featured" class="form-check-input" {{ product.isFeatured ? 'checked' : '' }}>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success">{{ product.id ? 'Modifier' : 'Ajouter' }}</button>
+        </div>
+        
+        {{ form_end(form) }}
+    </form>
+</div>
+{% endblock %}

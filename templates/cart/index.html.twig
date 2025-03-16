@@ -7,46 +7,44 @@
     <h2 class="mb-4">Votre Panier</h2>
 
     {% if cart is defined and cart|length > 0 %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Nom du produit</th>
-                    <th>Taille</th>
-                    <th>Quantité</th>
-                    <th>Prix Unitaire</th>
-                    <th>Total</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set total = 0 %}
-                {% for item in cart %}
-                    <tr>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.size }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>{{ item.price }} €</td>
-                        <td>{{ (item.price * item.quantity)|number_format(2, ',', ' ') }} €</td>
-                        <td>
-                            <a href="{{ path('app_cart_remove', { 'id': item.id, 'size': item.size }) }}" class="btn btn-danger btn-sm">
-                                Supprimer
-                            </a>
-                        </td>
-                    </tr>
-                    {% set total = total + (item.price * item.quantity) %}
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="text-end">
-            <strong>Total du panier : {{ total|number_format(2, ',', ' ') }} €</strong>
+        <div class="row">
+            {% set total = 0 %}
+            {% for item in cart %}
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="row g-0">
+                            <div class="col-md-2">
+                                <img src="{{ asset('uploads/products/' ~ item.image) }}" class="img-fluid rounded-start" alt="{{ item.name }}">
+                            </div>
+                            <div class="col-md-7">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ item.name }}</h5>
+                                    <p class="card-text"><strong>Prix :</strong> {{ item.price }} €</p>
+                                    <p class="card-text"><strong>Taille :</strong> {{ item.size }}</p>
+                                    <p class="card-text"><strong>Quantité :</strong> {{ item.quantity }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                <a href="{{ path('app_cart_remove', { 'id': item.id, 'size': item.size }) }}" class="btn btn-danger">Retirer du panier</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% set total = total + (item.price * item.quantity) %}
+            {% endfor %}
         </div>
 
-        <div class="d-flex justify-content-between mt-3">
-            <a href="{{ path('app_product_index') }}" class="btn btn-secondary">Continuer mes achats</a>
-            <a href="{{ path('app_cart_clear') }}" class="btn btn-warning">Vider le panier</a>
-            <button id="checkout-button" class="btn btn-success">Payer la commande</button>
+        <!-- Section Total et boutons d'action -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h4><strong>Total :</strong> {{ total|number_format(2, ',', ' ') }} €</h4>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="{{ path('app_product_index') }}" class="btn btn-success">Continuer mes achats</a>
+                <button id="checkout-button" class="btn btn-danger">Finaliser ma commande</button>
+            </div>
         </div>
+
     {% else %}
         <p class="text-center">Votre panier est vide.</p>
     {% endif %}
@@ -63,7 +61,6 @@
             const checkoutButton = document.getElementById("checkout-button");
             if (checkoutButton) {
                 checkoutButton.addEventListener("click", function () {
-                    // 🔹 Convertir le panier en JSON et afficher dans la console
                     let cartData = {{ cart|json_encode()|raw }};
                     console.log("📦 Données envoyées au serveur :", cartData);
 

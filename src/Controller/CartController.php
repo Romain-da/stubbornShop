@@ -6,7 +6,7 @@ use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 #[Route('/cart')]
@@ -19,51 +19,47 @@ class CartController extends AbstractController
         
         return $this->render('cart/index.html.twig', [
             'cart' => $cart,
-            'stripe_public_key' => $this->getParameter('stripe_public_key') // 🔹 Ajout de la clé
+            'stripe_public_key' => $this->getParameter('stripe_public_key')
         ]);
     }
 
-    #[Route('/add/{id}', name: 'app_cart_add', methods: ['POST'])]
-    public function addToCart(Request $request, ProductRepository $productRepository, SessionInterface $session, int $id): Response
+    #[Route('/add/{id}', name: 'app_cart_add', methods: ['POST', 'GET'])]
+    public function addToCart(int $id, Request $request, SessionInterface $session, ProductRepository $productRepository): Response
     {
-        $product = $productRepository->find($id);
-        if (!$product) {
-            throw $this->createNotFoundException('Produit non trouvé.');
-        }
-
-        $size = $request->request->get('size');
-        if (!$size) {
-            $this->addFlash('danger', 'Veuillez choisir une taille.');
-            return $this->redirectToRoute('app_product_show', ['id' => $id]);
-        }
-
-        // Récupération du panier existant
         $cart = $session->get('cart', []);
 
-        // Vérifie si l'article existe déjà dans le panier avec la même taille
+        $product = $productRepository->find($id);
+        if (!$product) {
+            throw $this->createNotFoundException("Le produit n'existe pas.");
+        }
+
+        $size = $request->request->get('size', 'M'); // Taille par défaut si non sélectionnée
+
+        // Vérifie si le produit avec cette taille est déjà dans le panier
         $found = false;
         foreach ($cart as &$item) {
             if ($item['id'] === $id && $item['size'] === $size) {
-                $item['quantity']++; // Augmente la quantité
+                $item['quantity'] += 1;
                 $found = true;
                 break;
             }
         }
 
-        // Si le produit n'est pas encore dans le panier, l'ajouter
         if (!$found) {
             $cart[] = [
-                'id' => $id,
+                'id' => $product->getId(),
                 'name' => $product->getName(),
                 'price' => $product->getPrice(),
-                'size' => $size, 
+                'size' => $size,
                 'quantity' => 1,
+                'image' => $product->getImage() ?? 'placeholder.png' // 🔹 Ajout de l'image par défaut si elle n'existe pas
             ];
         }
 
         $session->set('cart', $cart);
 
-        $this->addFlash('success', 'Produit ajouté au panier avec succès !');
+        $this->addFlash('success', 'Produit ajouté au panier !');
+
         return $this->redirectToRoute('app_cart');
     }
 

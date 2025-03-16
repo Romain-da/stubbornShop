@@ -1,12 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ product.name }} - Détails{% endblock %}
+{% block title %}{{ product.name }}{% endblock %}
 
 {% block body %}
-<div class="container">
-    <h1 class="text-center my-4">{{ product.name }}</h1>
-
+<div class="container mt-4">
     <div class="row">
+        <!-- Image du produit -->
         <div class="col-md-6">
             {% if product.image %}
                 <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.name }}" class="img-fluid">
@@ -14,13 +13,18 @@
                 <img src="{{ asset('images/placeholder.png') }}" alt="Image non disponible" class="img-fluid">
             {% endif %}
         </div>
-        <div class="col-md-6">
-            <h3>Prix: {{ product.price }} €</h3>
-            <p>{{ product.description }}</p>
 
+        <!-- Détails du produit et formulaire d'ajout au panier -->
+        <div class="col-md-6">
+            <h2>{{ product.name }}</h2>
+            <p><strong>Prix :</strong> {{ product.price }} €</p>
+            <p><strong>Description :</strong> {{ product.description }}</p>
+
+            <!-- Sélection de la taille -->
             <form action="{{ path('app_cart_add', { id: product.id }) }}" method="post">
-                <label for="size">Choisissez une taille :</label>
+                <label for="size"><strong>Taille :</strong></label>
                 <select name="size" id="size" class="form-select mb-3">
+                    <option value="XS">XS</option>
                     <option value="S">S</option>
                     <option value="M">M</option>
                     <option value="L">L</option>
@@ -28,9 +32,22 @@
                 </select>
                 <button type="submit" class="btn btn-primary">Ajouter au panier</button>
             </form>
+
+            <!-- Boutons Admin -->
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="mt-3">
+                    <a href="{{ path('app_product_edit', { 'id': product.id }) }}" class="btn btn-warning">Modifier</a>
+
+                    <form action="{{ path('app_product_delete', { 'id': product.id }) }}" method="post" style="display:inline;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Confirmer la suppression ?');">Supprimer</button>
+                    </form>
+                </div>
+            {% endif %}
+
+            <!-- Bouton Retour -->
+            <a href="{{ path('app_product_index') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
         </div>
     </div>
-
-    <a href="{{ path('app_product_index') }}" class="btn btn-secondary mt-3">Retour à la boutique</a>
 </div>
 {% endblock %}

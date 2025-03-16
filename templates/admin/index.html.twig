@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boutique{% endblock %}
+
+{% block body %}
+    <h2 class="text-center my-4">Gestion des Produits</h2>
+
+    {# ✅ Seuls les admins voient le bouton "Créer un produit" #}
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="text-center mb-4">
+            <a href="{{ path('admin_product_manage') }}" class="btn btn-primary">Créer un produit</a>
+        </div>
+    {% endif %}
+
+    <h3>Liste des produits</h3>
+
+    {% for product in products %}
+        <div class="card p-3 mb-3">
+            <div class="row align-items-center">
+                {# ✅ Image du produit #}
+                <div class="col-md-2">
+                    {% if product.image %}
+                        <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.name }}" class="img-fluid">
+                    {% else %}
+                        <p class="text-muted">Aucune image</p>
+                    {% endif %}
+                </div>
+
+                {# ✅ Infos du produit #}
+                <div class="col-md-2"><strong>{{ product.name }}</strong></div>
+                <div class="col-md-2"><strong>{{ product.price }} €</strong></div>
+                <div class="col-md-1">{{ product.stockXS }}</div>
+                <div class="col-md-1">{{ product.stockS }}</div>
+                <div class="col-md-1">{{ product.stockM }}</div>
+                <div class="col-md-1">{{ product.stockL }}</div>
+                <div class="col-md-1">{{ product.stockXL }}</div>
+
+                {# ✅ Actions #}
+                <div class="col-md-2 text-end">
+                    {# ✅ Ajout au panier disponible pour tout le monde #}
+                    <a href="{{ path('app_cart_add', { 'id': product.id }) }}" class="btn btn-success btn-sm">Ajouter au panier</a>
+
+                    {# ✅ Modifier et Supprimer visibles uniquement pour les admins #}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_product_manage', { 'id': product.id }) }}" class="btn btn-warning btn-sm">Modifier</a>
+
+                        <form action="{{ path('admin_product_delete', { 'id': product.id }) }}" method="post" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Confirmer la suppression ?');">Supprimer</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-center text-muted">Aucun produit disponible.</p>
+    {% endfor %}
+{% endblock %}

@@ -16,11 +16,17 @@
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand" href="{{ path('app_home') }}">Stubborn</a>
+            <!-- Logo cliquable qui renvoie vers l'accueil -->
+            <a class="navbar-brand d-flex align-items-center" href="{{ path('app_home') }}">
+                <img src="{{ asset('images/Logo.png') }}" alt="Logo Stubborn" width="50" height="50" class="me-2">
+                <span>Don't compromise on your look</span>
+            </a>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link fw-bold" href="{{ path('app_home') }}">Accueil</a></li>
@@ -28,7 +34,11 @@
                     {% if app.user is defined and app.user %}
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_product_index') }}">Boutique</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_cart') }}">Panier</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ path('app_product_new') }}">Créer un produit</a></li>
+                        
+                        {% if 'ROLE_ADMIN' in app.user.roles %}
+                            <li class="nav-item"><a class="nav-link" href="{{ path('admin_product_manage') }}">Créer un produit</a></li>
+                        {% endif %}
+                        
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_account') }}">Mon compte</a></li>
                         <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}">Se déconnecter</a></li>
                     {% else %}
@@ -40,13 +50,17 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <main class="container mt-4">
         {% block body %}{% endblock %}
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer class="bg-light text-center py-3 mt-4">
         <p>Informations de la société</p>
+        <li>Nom de la société : Stubborn</li>
+        <li>Adresse : Piccadilly Circus, London W1J 0DA, Royaume-Uni</li>
+        <li>Adresse de contact : <a href="mailto:stubborn@blabla.com">stubborn@blabla.com</a></li>
+        <li>Slogan : Don't compromise on your look</li>
     </footer>
 
     <!-- Bootstrap JS via CDN -->

@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.id is defined ? 'Modifier' : 'Créer' }} un produit{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h2 class="my-4 text-center">{{ product.id is defined ? 'Modifier' : 'Créer' }} un produit</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-2">
+                <label>Image</label>
+                <input type="file" name="image" class="form-control">
+                {% if product.image %}
+                    <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="Image actuelle" class="img-fluid mt-2">
+                {% endif %}
+            </div>
+            <div class="col-md-2">
+                <label>Nom</label>
+                <input type="text" name="name" class="form-control" value="{{ product.name }}">
+            </div>
+            <div class="col-md-1">
+                <label>Prix (€)</label>
+                <input type="number" step="0.01" name="price" class="form-control" value="{{ product.price }}">
+            </div>
+            <div class="col-md-1">
+                <label>Stock XS</label>
+                <input type="number" name="stock_xs" class="form-control" value="{{ product.stockXS }}">
+            </div>
+            <div class="col-md-1">
+                <label>Stock S</label>
+                <input type="number" name="stock_s" class="form-control" value="{{ product.stockS }}">
+            </div>
+            <div class="col-md-1">
+                <label>Stock M</label>
+                <input type="number" name="stock_m" class="form-control" value="{{ product.stockM }}">
+            </div>
+            <div class="col-md-1">
+                <label>Stock L</label>
+                <input type="number" name="stock_l" class="form-control" value="{{ product.stockL }}">
+            </div>
+            <div class="col-md-1">
+                <label>Stock XL</label>
+                <input type="number" name="stock_xl" class="form-control" value="{{ product.stockXL }}">
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success">{{ product.id is defined ? 'Modifier' : 'Ajouter' }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
